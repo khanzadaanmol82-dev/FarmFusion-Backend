@@ -8,7 +8,10 @@ const progressSchema = new mongoose.Schema({
   height:         { type: Number },
   milkProduction: { type: Number },
   healthStatus:   { type: String, enum: ['Excellent','Good','Fair','Poor'], default: 'Good' },
-  notes:          { type: String }
+  notes:          { type: String },
+  imageBase64:    { type: String },
+  imageMimeType:  { type: String },
+  videoLink:      { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('AnimalProgress', progressSchema);
