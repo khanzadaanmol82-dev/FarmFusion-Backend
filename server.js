@@ -29,6 +29,7 @@ app.use('/api/installments', require('./routes/installments'));
 app.use('/api/vouchers',     require('./routes/vouchers'));
 app.use('/api/progress',     require('./routes/progress'));
 app.use('/api/enquiries', require('./routes/enquiries'));
+app.use('/api/vaccinations', require('./routes/vaccinations'));
 
 // MongoDB + Start server
 mongoose.connect(process.env.MONGO_URI)
