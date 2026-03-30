@@ -44,5 +44,26 @@ router.post('/:id/buy', async (req, res) => {
     res.json({ success: true, message: 'Animal purchased!', animal: newAnimal });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
+// Update listing
+router.put('/:id', async (req, res) => {
+  try {
+    const listing = await Cattle.findOneAndUpdate(
+      { _id: req.params.id, seller: req.user._id },
+      req.body,
+      { new: true }
+    );
+    if (!listing) return res.status(404).json({ message: 'Listing not found' });
+    res.json({ success: true, listing });
+  } catch (e) { res.status(400).json({ message: e.message }); }
+});
+
+// Delete listing
+router.delete('/:id', async (req, res) => {
+  try {
+    const listing = await Cattle.findOneAndDelete({ _id: req.params.id, seller: req.user._id });
+    if (!listing) return res.status(404).json({ message: 'Listing not found' });
+    res.json({ success: true, message: 'Listing removed' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
 
 module.exports = router;
