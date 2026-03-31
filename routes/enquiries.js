@@ -59,5 +59,10 @@ router.patch('/:id/status', async (req, res) => {
     res.json({ success: true, enquiry });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
-
+router.delete('/:id', async (req, res) => {
+  try {
+    await Enquiry.findOneAndDelete({ _id: req.params.id, seller: req.user._id });
+    res.json({ success: true, message: 'Enquiry deleted' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
 module.exports = router;
