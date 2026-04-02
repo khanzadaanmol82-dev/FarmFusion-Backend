@@ -65,5 +65,28 @@ router.delete('/:id', async (req, res) => {
     res.json({ success: true, message: 'Listing removed' });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
+// Update the status route to include notification info
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const enquiry = await Enquiry.findOneAndUpdate(
+      { _id: req.params.id, seller: req.user._id },
+      { status },
+      { new: true }
+    ).populate('cattle', 'name tagId species price');
+    if (!enquiry) return res.status(404).json({ message: 'Enquiry not found' });
+    res.json({ success: true, enquiry });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// ✅ Buyer checks their sent enquiries for status updates
+router.get('/sent', async (req, res) => {
+  try {
+    const enquiries = await Enquiry.find({ buyer: req.user._id })
+      .populate('cattle', 'name tagId species price seller')
+      .sort({ updatedAt: -1 });
+    res.json({ success: true, enquiries });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
 
 module.exports = router;
