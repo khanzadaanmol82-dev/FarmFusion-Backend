@@ -36,13 +36,19 @@ router.get('/received', async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Get enquiries sent (buyer sees what they enquired)
+// Get enquiries sent (buyer) — FIXED: nested populate so cattle.name & cattle.seller work
 router.get('/sent', async (req, res) => {
   try {
     const enquiries = await Enquiry.find({ buyer: req.user._id })
-      .populate('cattle', 'name tagId species price')
-      .populate('seller', 'name farmName phone')
-      .sort({ createdAt: -1 });
+      .populate({
+        path: 'cattle',
+        select: 'name tagId species price seller',
+        populate: {
+          path: 'seller',
+          select: 'name farmName phone'
+        }
+      })
+      .sort({ updatedAt: -1 });
     res.json({ success: true, enquiries });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
@@ -59,10 +65,13 @@ router.patch('/:id/status', async (req, res) => {
     res.json({ success: true, enquiry });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
+
+// Delete enquiry (seller)
 router.delete('/:id', async (req, res) => {
   try {
     await Enquiry.findOneAndDelete({ _id: req.params.id, seller: req.user._id });
     res.json({ success: true, message: 'Enquiry deleted' });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
+
 module.exports = router;
