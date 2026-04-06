@@ -11,6 +11,10 @@ const progressSchema = new mongoose.Schema({
   notes:          { type: String },
   imageBase64:    { type: String },
   imageMimeType:  { type: String },
+  // ✅ NEW — direct video upload fields
+  videoBase64:    { type: String },
+  videoMimeType:  { type: String },
+  // keep for backward compat with any existing YouTube links
   videoLink:      { type: String },
 }, { timestamps: true });
 
