@@ -61,15 +61,7 @@ router.patch('/:id/status', async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Delete by seller
-router.delete('/:id', async (req, res) => {
-  try {
-    await Enquiry.findOneAndDelete({ _id: req.params.id, seller: req.user._id });
-    res.json({ success: true, message: 'Enquiry deleted' });
-  } catch (e) { res.status(500).json({ message: e.message }); }
-});
-
-// ✅ Delete sent enquiry by buyer
+// ✅ Delete sent enquiry by buyer — MUST be before /:id
 router.delete('/sent/:id', async (req, res) => {
   try {
     const enquiry = await Enquiry.findOneAndDelete({
@@ -78,6 +70,14 @@ router.delete('/sent/:id', async (req, res) => {
     });
     if (!enquiry) return res.status(404).json({ message: 'Enquiry not found' });
     res.json({ success: true, message: 'Enquiry removed' });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// Delete by seller — generic /:id must come AFTER specific routes
+router.delete('/:id', async (req, res) => {
+  try {
+    await Enquiry.findOneAndDelete({ _id: req.params.id, seller: req.user._id });
+    res.json({ success: true, message: 'Enquiry deleted' });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
