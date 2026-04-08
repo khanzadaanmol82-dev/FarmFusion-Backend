@@ -24,6 +24,19 @@ router.post('/', async (req, res) => {
   } catch (e) { res.status(400).json({ message: e.message }); }
 });
 
+// ✅ THIS WAS MISSING — add it
+router.put('/:id', async (req, res) => {
+  try {
+    const record = await FeedingRecord.findOneAndUpdate(
+      { _id: req.params.id, owner: req.user._id },
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!record) return res.status(404).json({ message: 'Record not found' });
+    res.json({ success: true, record });
+  } catch (e) { res.status(400).json({ message: e.message }); }
+});
+
 router.delete('/:id', async (req, res) => {
   try {
     await FeedingRecord.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
