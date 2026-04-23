@@ -21,8 +21,12 @@ app.use(express.json({ limit: '150mb' }));
 app.use(express.urlencoded({ extended: true, limit: '150mb' }));
 
 // ── Serve uploaded videos as static files ──────────────────────────
-// Videos will be accessible at: http://yourserver.com/uploads/videos/filename.mp4
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ── Root route (fixes "Cannot GET /") ─────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ message: 'FarmFusion API is running 🌾' });
+});
 
 // ── Health check ───────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
@@ -45,13 +49,17 @@ app.use('/api/progress',     require('./routes/progress'));
 app.use('/api/enquiries',    require('./routes/enquiries'));
 app.use('/api/vaccinations', require('./routes/vaccinations'));
 
+// ── 404 handler for unknown API routes ────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
+});
+
 // ── MongoDB + Start server ─────────────────────────────────────────
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(process.env.PORT || 5000, () =>
-      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`)
-    );
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch(err => {
     console.error('❌ MongoDB error:', err.message);
